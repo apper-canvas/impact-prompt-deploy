@@ -3,6 +3,8 @@ import { Suspense, lazy } from "react";
 import Layout from "@/components/organisms/Layout";
 
 const PromptDashboard = lazy(() => import("@/components/pages/PromptDashboard"));
+const VersionHistory = lazy(() => import("@/components/pages/VersionHistory"));
+const VersionComparison = lazy(() => import("@/components/pages/VersionComparison"));
 const NotFound = lazy(() => import("@/components/pages/NotFound"));
 
 const LoadingFallback = () => (
@@ -23,6 +25,22 @@ const mainRoutes = [
     element: (
       <Suspense fallback={<LoadingFallback />}>
         <PromptDashboard />
+      </Suspense>
+    ),
+},
+  {
+    path: "versions/:id",
+    element: (
+      <Suspense fallback={<LoadingFallback />}>
+        <VersionHistory />
+      </Suspense>
+    ),
+  },
+  {
+    path: "versions/:id/compare/:version1/:version2",
+    element: (
+      <Suspense fallback={<LoadingFallback />}>
+        <VersionComparison />
       </Suspense>
     ),
   },

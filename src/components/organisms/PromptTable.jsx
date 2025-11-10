@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { format } from "date-fns";
 import ApperIcon from "@/components/ApperIcon";
-import Badge from "@/components/atoms/Badge";
 import Button from "@/components/atoms/Button";
 import Select from "@/components/atoms/Select";
+import Badge from "@/components/atoms/Badge";
 import ActionMenu from "@/components/molecules/ActionMenu";
 import StatusBadge from "@/components/molecules/StatusBadge";
 import SearchBar from "@/components/molecules/SearchBar";
@@ -68,15 +68,15 @@ const AI_MODELS = [
   },
 ];
 
-const PromptTable = ({ prompts, onEdit, onDelete }) => {
-  const [searchTerm, setSearchTerm] = useState("");
+const PromptTable = ({ prompts, onEdit, onDelete, onViewVersions }) => {
+const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: "createdDate", direction: "desc" });
   const [modelFilter, setModelFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [providerFilter, setProviderFilter] = useState("");
-// Extract unique filter options from prompts
-const [expandedRows, setExpandedRows] = useState(new Set());
+  // Extract unique filter options from prompts
+  const [expandedRows, setExpandedRows] = useState(new Set());
 
   const filterOptions = useMemo(() => {
     const models = [...new Set(prompts.map(p => p.model).filter(Boolean))].sort();
@@ -111,12 +111,12 @@ const sortedPrompts = useMemo(() => {
       sorted.sort((a, b) => {
         const aValue = sortConfig.key === "createdDate" || sortConfig.key === "updatedDate" || sortConfig.key === "deploymentDate"
           ? new Date(a[sortConfig.key] || 0).getTime()
-          : sortConfig.key === "totalUsage" || sortConfig.key === "successRate" || sortConfig.key === "avgResponseTime" || sortConfig.key === "totalCost"
+          : sortConfig.key === "totalUsage" || sortConfig.key === "successRate" || sortConfig.key === "avgResponseTime" || sortConfig.key === "totalCost" || sortConfig.key === "currentVersion"
           ? (a[sortConfig.key] || 0)
           : a[sortConfig.key];
         const bValue = sortConfig.key === "createdDate" || sortConfig.key === "updatedDate" || sortConfig.key === "deploymentDate"
           ? new Date(b[sortConfig.key] || 0).getTime()
-          : sortConfig.key === "totalUsage" || sortConfig.key === "successRate" || sortConfig.key === "avgResponseTime" || sortConfig.key === "totalCost"
+          : sortConfig.key === "totalUsage" || sortConfig.key === "successRate" || sortConfig.key === "avgResponseTime" || sortConfig.key === "totalCost" || sortConfig.key === "currentVersion"
           ? (b[sortConfig.key] || 0)
           : b[sortConfig.key];
 
@@ -355,6 +355,9 @@ const handleSort = (key) => {
                     )}
                   </div>
                 </th>
+<th className="px-6 py-4 text-left">
+                  <SortButton sortKey="currentVersion">Version</SortButton>
+                </th>
                 <th className="px-6 py-4 text-left">
                   <SortButton sortKey="createdDate">Created</SortButton>
                 </th>
@@ -455,8 +458,20 @@ const handleSort = (key) => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-600">
-                      <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPerformanceColor(prompt.successRate || 0, 'successRate')}`}>
+<div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPerformanceColor(prompt.successRate || 0, 'successRate')}`}>
                         {formatPercentage(prompt.successRate || 0)}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-600">
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="outline" className="text-xs font-mono">
+                          v{prompt.currentVersion || "1.0.0"}
+                        </Badge>
+                        {prompt.versions && prompt.versions.length > 1 && (
+                          <Badge variant="secondary" className="text-xs">
+                            {prompt.versions.length} versions
+                          </Badge>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-600">
@@ -466,6 +481,7 @@ const handleSort = (key) => {
                       <ActionMenu
                         onEdit={() => onEdit(prompt)}
                         onDelete={() => onDelete(prompt)}
+                        onViewVersions={() => onViewVersions(prompt)}
                       />
                     </td>
                     <td className="px-6 py-4">
@@ -483,21 +499,21 @@ const handleSort = (key) => {
                     </td>
                   </tr>
                   
-                  {expandedRows.has(prompt.Id) && (
+{expandedRows.has(prompt.Id) && (
                     <tr className="bg-slate-50">
-                      <td colSpan={11} className="px-6 py-6">
+                      <td colSpan={12} className="px-6 py-6">
                         <div className="bg-white rounded-lg p-6 border border-slate-200">
                           <div className="flex items-center justify-between mb-6">
                             <h4 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
                               <ApperIcon name="BarChart3" size={20} />
-                              Performance Metrics
+                              Performance Metrics & Version Info
                             </h4>
                             <div className="text-sm text-slate-500">
                               Last updated: {prompt.updatedDate ? format(new Date(prompt.updatedDate), "MMM d, yyyy 'at' HH:mm") : 'Never'}
                             </div>
                           </div>
                           
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                             {/* Total Usage */}
                             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                               <div className="flex items-center justify-between mb-2">
@@ -554,6 +570,46 @@ const handleSort = (key) => {
                               <div className="text-xs text-purple-600">
                                 {formatCurrency(prompt.costPerRequest || 0)} per request
                               </div>
+                            </div>
+                          </div>
+
+                          {/* Version History Preview */}
+                          <div className="border-t border-slate-200 pt-6">
+                            <div className="flex items-center justify-between mb-4">
+                              <h5 className="text-md font-medium text-slate-900 flex items-center gap-2">
+                                <ApperIcon name="GitBranch" size={18} />
+                                Recent Versions
+                              </h5>
+                              <Button
+                                onClick={() => onViewVersions(prompt)}
+                                variant="outline"
+                                size="sm"
+                                className="text-xs"
+                              >
+                                View All Versions
+                              </Button>
+                            </div>
+                            <div className="space-y-2">
+                              {(prompt.versions || []).slice(-3).reverse().map((version, index) => (
+                                <div key={version.version} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                  <div className="flex items-center gap-3">
+                                    <Badge variant="outline" className="text-xs font-mono">
+                                      v{version.version}
+                                    </Badge>
+                                    <span className="text-sm text-slate-600">
+                                      {version.changeLog}
+                                    </span>
+                                  </div>
+                                  <div className="text-xs text-slate-500">
+                                    {format(new Date(version.createdDate), "MMM d, yyyy")}
+                                  </div>
+                                </div>
+                              ))}
+                              {(!prompt.versions || prompt.versions.length === 0) && (
+                                <div className="text-sm text-slate-500 text-center py-4">
+                                  No version history available
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>

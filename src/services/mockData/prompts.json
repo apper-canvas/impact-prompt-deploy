@@ -1,6 +1,6 @@
 [
-  {
-"Id": 1,
+{
+    "Id": 1,
     "name": "Customer Support Assistant",
     "description": "AI assistant for handling customer inquiries and support tickets",
     "model": "gpt-4",
@@ -21,7 +21,60 @@
     "successRate": 97.3,
     "avgResponseTime": 320,
     "costPerRequest": 0.0035,
-    "totalCost": 53.97
+    "totalCost": 53.97,
+    "currentVersion": "1.2.1",
+    "versions": [
+      {
+        "version": "1.0.0",
+        "changeLog": "Initial customer support assistant created",
+        "createdDate": "2024-01-15T10:30:00Z",
+        "changes": {
+          "type": "created",
+          "description": "Initial prompt configuration for customer support"
+        },
+        "deploymentInfo": {
+          "environment": "Development",
+          "deploymentUrl": "",
+          "deploymentDate": null
+        }
+      },
+      {
+        "version": "1.1.0",
+        "changeLog": "Improved response accuracy and added handling for complex queries",
+        "createdDate": "2024-01-18T09:15:00Z",
+        "changes": {
+          "type": "updated",
+          "fields": [
+            { "field": "description", "oldValue": "Basic AI assistant for customer inquiries", "newValue": "AI assistant for handling customer inquiries and support tickets" },
+            { "field": "temperature", "oldValue": 0.8, "newValue": 0.7 }
+          ],
+          "description": "Updated description, temperature"
+        },
+        "deploymentInfo": {
+          "environment": "Staging",
+          "deploymentUrl": "https://staging-api.example.com/prompts/customer-support",
+          "deploymentDate": "2024-01-18T14:00:00Z"
+        }
+      },
+      {
+        "version": "1.2.1",
+        "changeLog": "Production deployment with performance optimizations",
+        "createdDate": "2024-01-20T14:22:00Z",
+        "changes": {
+          "type": "updated",
+          "fields": [
+            { "field": "environment", "oldValue": "Staging", "newValue": "Production" },
+            { "field": "deploymentUrl", "oldValue": "https://staging-api.example.com/prompts/customer-support", "newValue": "https://api.example.com/prompts/customer-support" }
+          ],
+          "description": "Updated environment, deploymentUrl"
+        },
+        "deploymentInfo": {
+          "environment": "Production",
+          "deploymentUrl": "https://api.example.com/prompts/customer-support",
+          "deploymentDate": "2024-01-21T09:15:00Z"
+        }
+      }
+    ]
   },
   {
 "Id": 2,

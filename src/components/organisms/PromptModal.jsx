@@ -96,7 +96,8 @@ const [formData, setFormData] = useState({
     successRate: 0,
     avgResponseTime: 0,
     costPerRequest: 0,
-    totalCost: 0
+    totalCost: 0,
+    changeLog: ""
   });
 
   const [currentTag, setCurrentTag] = useState("");
@@ -115,7 +116,7 @@ const [formData, setFormData] = useState({
 
   useEffect(() => {
 if (prompt) {
-setFormData({
+      setFormData({
         name: prompt.name || "",
         description: prompt.description || "",
         model: prompt.model || "",
@@ -133,10 +134,11 @@ setFormData({
         successRate: prompt.successRate || 0,
         avgResponseTime: prompt.avgResponseTime || 0,
         costPerRequest: prompt.costPerRequest || 0,
-        totalCost: prompt.totalCost || 0
+        totalCost: prompt.totalCost || 0,
+        changeLog: ""
       });
     } else {
-setFormData({
+      setFormData({
         name: "",
         description: "",
         model: "",
@@ -154,7 +156,8 @@ setFormData({
         successRate: 0,
         avgResponseTime: 0,
         costPerRequest: 0,
-        totalCost: 0
+        totalCost: 0,
+        changeLog: ""
       });
     }
     setCurrentTag("");
@@ -605,9 +608,44 @@ const handleTagKeyPress = (e) => {
                     placeholder="12.45"
                     disabled={loading}
                   />
-                </FormField>
+</FormField>
               </div>
             </div>
+
+            {/* Version Information */}
+            {prompt && (
+              <div className="col-span-2 border-t border-slate-200 pt-6 mt-6">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                  <ApperIcon name="GitBranch" size={20} />
+                  Version Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="bg-slate-50 p-4 rounded-lg">
+                    <div className="text-sm font-medium text-slate-700 mb-1">Current Version</div>
+                    <div className="text-lg font-semibold text-slate-900">{prompt.currentVersion || "1.0.0"}</div>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-lg">
+                    <div className="text-sm font-medium text-slate-700 mb-1">Total Versions</div>
+                    <div className="text-lg font-semibold text-slate-900">{prompt.versions?.length || 1}</div>
+                  </div>
+                </div>
+                <FormField
+                  label="Change Log (Optional)"
+                  error={errors.changeLog}
+                >
+                  <textarea
+                    value={formData.changeLog}
+                    onChange={(e) => handleInputChange("changeLog", e.target.value)}
+                    placeholder="Describe the changes you're making..."
+                    rows={3}
+                    disabled={loading}
+                    className={`flex w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-accent focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-50 resize-none ${
+                      errors.changeLog ? "border-red-500 focus:border-red-500 focus:ring-red-100" : ""
+                    }`}
+                  />
+                </FormField>
+              </div>
+            )}
           </form>
 
           {/* Footer */}

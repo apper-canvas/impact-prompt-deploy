@@ -10,14 +10,14 @@ import ErrorView from "@/components/ui/ErrorView";
 import Empty from "@/components/ui/Empty";
 
 const PromptDashboard = () => {
-  const [prompts, setPrompts] = useState([]);
+const [prompts, setPrompts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
-
+  const [selectedPromptForVersion, setSelectedPromptForVersion] = useState(null);
 const loadPrompts = async () => {
     try {
       setLoading(true);
@@ -60,7 +60,7 @@ const loadPrompts = async () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleSavePrompt = async (promptData) => {
+const handleSavePrompt = async (promptData) => {
     try {
       setModalLoading(true);
       
@@ -68,7 +68,7 @@ const loadPrompts = async () => {
         // Update existing prompt
         const updatedPrompt = await promptService.update(selectedPrompt.Id, promptData);
         setPrompts(prev => prev.map(p => p.Id === selectedPrompt.Id ? updatedPrompt : p));
-        toast.success("Prompt updated successfully!");
+        toast.success(`Prompt updated successfully! New version: ${updatedPrompt.currentVersion}`);
       } else {
         // Create new prompt
         const newPrompt = await promptService.create(promptData);
@@ -84,6 +84,14 @@ const loadPrompts = async () => {
     } finally {
       setModalLoading(false);
     }
+  };
+
+  const handleViewVersions = (prompt) => {
+    setSelectedPromptForVersion(prompt);
+  };
+
+  const handleCloseVersions = () => {
+    setSelectedPromptForVersion(null);
   };
 
   const handleConfirmDelete = async () => {
@@ -156,10 +164,11 @@ const loadPrompts = async () => {
             onAction={handleAddPrompt}
           />
         ) : (
-          <PromptTable
+<PromptTable
             prompts={prompts}
             onEdit={handleEditPrompt}
             onDelete={handleDeletePrompt}
+            onViewVersions={handleViewVersions}
           />
         )}
       </main>

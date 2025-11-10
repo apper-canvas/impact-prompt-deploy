@@ -560,8 +560,7 @@ const handleSort = (key) => {
                       </td>
                     </tr>
                   )}
-                </React.Fragment>
-              ))}
+</React.Fragment>
               ))}
             </tbody>
           </table>

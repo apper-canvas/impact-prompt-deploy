@@ -76,7 +76,9 @@ return prompts.filter(prompt =>
       prompt.provider?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       prompt.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       prompt.environment?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      prompt.deploymentUrl?.toLowerCase().includes(searchTerm.toLowerCase())
+      prompt.deploymentUrl?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prompt.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      prompt.category?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [prompts, searchTerm]);
 
@@ -99,7 +101,7 @@ const aValue = sortConfig.key === "createdDate" || sortConfig.key === "updatedDa
     return sorted;
   }, [filteredPrompts, sortConfig]);
 
-  const handleSort = (key) => {
+const handleSort = (key) => {
     setSortConfig(current => ({
       key,
       direction: current.key === key && current.direction === "asc" ? "desc" : "asc"
@@ -144,7 +146,7 @@ const aValue = sortConfig.key === "createdDate" || sortConfig.key === "updatedDa
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-4 text-left">
+<th className="px-6 py-4 text-left">
                   <SortButton sortKey="name">Name</SortButton>
                 </th>
                 <th className="px-6 py-4 text-left">
@@ -152,7 +154,11 @@ const aValue = sortConfig.key === "createdDate" || sortConfig.key === "updatedDa
                 </th>
                 <th className="px-6 py-4 text-left">
                   <SortButton sortKey="status">Status</SortButton>
-</th>
+                </th>
+                <th className="px-6 py-4 text-left">
+                  <SortButton sortKey="category">Category</SortButton>
+                </th>
+                <th className="px-6 py-4 text-left">Tags</th>
                 <th 
                   className="px-6 py-4 text-left text-sm font-semibold text-slate-700 cursor-pointer hover:text-slate-900 transition-colors"
                   onClick={() => handleSort("environment")}
@@ -182,7 +188,7 @@ const aValue = sortConfig.key === "createdDate" || sortConfig.key === "updatedDa
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
-              {sortedPrompts.map((prompt) => (
+{sortedPrompts.map((prompt) => (
                 <tr 
                   key={prompt.Id} 
                   className="table-row hover:bg-slate-50 transition-colors"
@@ -215,7 +221,35 @@ const aValue = sortConfig.key === "createdDate" || sortConfig.key === "updatedDa
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <StatusBadge status={prompt.status} />
+<StatusBadge status={prompt.status} />
+                  </td>
+
+                  <td className="px-6 py-4 text-sm text-secondary">
+                    {prompt.category && (
+                      <Badge className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs font-medium">
+                        {prompt.category}
+                      </Badge>
+                    )}
+                  </td>
+
+                  <td className="px-6 py-4">
+                    {prompt.tags && prompt.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {prompt.tags.slice(0, 3).map((tag, index) => (
+                          <Badge
+                            key={index}
+                            className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs"
+                          >
+                            {tag}
+                          </Badge>
+                        ))}
+                        {prompt.tags.length > 3 && (
+                          <Badge className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
+                            +{prompt.tags.length - 3}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
                   </td>
 <td className="px-6 py-4 text-sm text-slate-600">
                     <div className="flex items-center space-x-2">
@@ -249,7 +283,7 @@ const aValue = sortConfig.key === "createdDate" || sortConfig.key === "updatedDa
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600">
                     {format(new Date(prompt.createdDate), "MMM d, yyyy")}
-                  </td>
+</td>
                   <td className="px-6 py-4">
                     <ActionMenu
                       onEdit={() => onEdit(prompt)}

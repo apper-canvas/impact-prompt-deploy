@@ -59,6 +59,8 @@ const now = new Date().toISOString();
       maxTokens: prompt.maxTokens,
       provider: prompt.provider,
       status: prompt.status,
+      tags: prompt.tags || [],
+      category: prompt.category || "",
       createdDate: now,
       updatedDate: now
     };
@@ -88,6 +90,8 @@ const updatedPrompt = {
       maxTokens: promptData.maxTokens,
       provider: promptData.provider,
       status: promptData.status,
+      tags: promptData.tags || [],
+      category: promptData.category || "",
       Id: parseInt(id), // Ensure Id remains unchanged
       createdDate: data[index].createdDate, // Preserve original creation date
       updatedDate: new Date().toISOString()

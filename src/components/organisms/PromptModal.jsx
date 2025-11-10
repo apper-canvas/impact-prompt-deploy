@@ -4,8 +4,8 @@ import ApperIcon from "@/components/ApperIcon";
 import Button from "@/components/atoms/Button";
 import Input from "@/components/atoms/Input";
 import Select from "@/components/atoms/Select";
+import Badge from "@/components/atoms/Badge";
 import FormField from "@/components/molecules/FormField";
-
 const AI_MODELS = [
   {
     id: "gpt-4",
@@ -87,10 +87,25 @@ const [formData, setFormData] = useState({
     maxTokens: 4096,
     provider: "",
     status: "Draft",
+    tags: [],
+    category: "",
     environment: "Development",
     deploymentUrl: "",
     deploymentDate: null
   });
+
+  const [currentTag, setCurrentTag] = useState("");
+
+  const categoryOptions = [
+    "Customer Service",
+    "Content Generation", 
+    "Data Analysis",
+    "Code Review",
+    "Documentation",
+    "Email & Communication",
+    "Meeting & Summarization",
+    "SQL & Database"
+  ];
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -104,6 +119,8 @@ setFormData({
         maxTokens: prompt.maxTokens || 4096,
         provider: prompt.provider || "",
         status: prompt.status || "Draft",
+        tags: prompt.tags || [],
+        category: prompt.category || "",
         environment: prompt.environment || "Development",
         deploymentUrl: prompt.deploymentUrl || "",
         deploymentDate: prompt.deploymentDate || null
@@ -118,11 +135,14 @@ setFormData({
         maxTokens: 4096,
         provider: "",
         status: "Draft",
+        tags: [],
+        category: "",
         environment: "Development",
         deploymentUrl: "",
         deploymentDate: null
       });
     }
+    setCurrentTag("");
     setErrors({});
 }, [prompt, isOpen]);
 
@@ -170,10 +190,33 @@ const validateForm = () => {
       newErrors.deploymentUrl = "Please enter a valid URL";
     }
 
-    setErrors(newErrors);
+setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleAddTag = () => {
+    if (currentTag.trim() && !formData.tags.includes(currentTag.trim().toLowerCase())) {
+      setFormData(prev => ({
+        ...prev,
+        tags: [...prev.tags, currentTag.trim().toLowerCase()]
+      }));
+      setCurrentTag("");
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter(tag => tag !== tagToRemove)
+    }));
+  };
+
+const handleTagKeyPress = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      handleAddTag();
+    }
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -371,7 +414,63 @@ label="Status"
                 ))}
               </Select>
             </FormField>
+{/* Tags Field */}
+              <FormField label="Tags" error={errors.tags}>
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <Input
+                      value={currentTag}
+                      onChange={(e) => setCurrentTag(e.target.value)}
+                      onKeyDown={handleTagKeyPress}
+                      placeholder="Add tags (press Enter or comma to add)"
+                      className="flex-1"
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleAddTag}
+                      disabled={!currentTag.trim()}
+                      className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Add
+                    </Button>
+                  </div>
+                  {formData.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {formData.tags.map((tag, index) => (
+                        <Badge
+                          key={index}
+                          className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
+                        >
+                          {tag}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveTag(tag)}
+                            className="text-blue-600 hover:text-blue-800 ml-1"
+                          >
+                            <ApperIcon name="X" size={14} />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </FormField>
 
+              {/* Category Field */}
+              <FormField label="Category" error={errors.category}>
+                <Select
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent"
+                >
+                  <option value="">Select a category</option>
+                  {categoryOptions.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </Select>
+              </FormField>
             {/* Deployment Information */}
             <div className="col-span-2 border-t border-slate-200 pt-6 mt-6">
               <h3 className="text-lg font-semibold text-slate-900 mb-4">Deployment Information</h3>
@@ -404,7 +503,7 @@ label="Status"
                   />
                 </FormField>
               </div>
-            </div>
+</div>
           </form>
 
           {/* Footer */}

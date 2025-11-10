@@ -68,7 +68,7 @@ const AI_MODELS = [
   },
 ];
 
-const PromptTable = ({ prompts, onEdit, onDelete, onViewVersions }) => {
+const PromptTable = ({ prompts, onEdit, onDelete, onViewVersions, onViewDetails }) => {
 const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: "createdDate", direction: "desc" });
   const [modelFilter, setModelFilter] = useState("");
@@ -368,7 +368,10 @@ const handleSort = (key) => {
             <tbody className="divide-y divide-slate-200">
 {sortedPrompts.map((prompt) => (
                 <React.Fragment key={prompt.Id}>
-                  <tr className="table-row hover:bg-slate-50 transition-colors">
+                  <tr 
+                    className="table-row hover:bg-slate-50 transition-colors cursor-pointer"
+                    onClick={() => onViewDetails && onViewDetails(prompt)}
+                  >
                     <td className="px-6 py-4">
                       <div>
                         <div className="font-medium text-slate-900">

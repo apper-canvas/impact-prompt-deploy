@@ -5,6 +5,7 @@ import Header from "@/components/organisms/Header";
 import PromptTable from "@/components/organisms/PromptTable";
 import PromptModal from "@/components/organisms/PromptModal";
 import DeleteModal from "@/components/organisms/DeleteModal";
+import DetailedPromptModal from "@/components/organisms/DetailedPromptModal";
 import Loading from "@/components/ui/Loading";
 import ErrorView from "@/components/ui/ErrorView";
 import Empty from "@/components/ui/Empty";
@@ -15,6 +16,7 @@ const [prompts, setPrompts] = useState([]);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDetailedViewOpen, setIsDetailedViewOpen] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [selectedPromptForVersion, setSelectedPromptForVersion] = useState(null);
@@ -86,12 +88,22 @@ const handleSavePrompt = async (promptData) => {
     }
   };
 
-  const handleViewVersions = (prompt) => {
+const handleViewVersions = (prompt) => {
     setSelectedPromptForVersion(prompt);
   };
 
   const handleCloseVersions = () => {
     setSelectedPromptForVersion(null);
+  };
+
+  const handleViewDetails = (prompt) => {
+    setSelectedPrompt(prompt);
+    setIsDetailedViewOpen(true);
+  };
+
+  const handleCloseDetailedView = () => {
+    setIsDetailedViewOpen(false);
+    setSelectedPrompt(null);
   };
 
   const handleConfirmDelete = async () => {
@@ -169,12 +181,13 @@ const handleSavePrompt = async (promptData) => {
             onEdit={handleEditPrompt}
             onDelete={handleDeletePrompt}
             onViewVersions={handleViewVersions}
+            onViewDetails={handleViewDetails}
           />
         )}
       </main>
 
       {/* Modals */}
-      <PromptModal
+<PromptModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSave={handleSavePrompt}
@@ -188,6 +201,12 @@ const handleSavePrompt = async (promptData) => {
         onConfirm={handleConfirmDelete}
         prompt={selectedPrompt}
         loading={modalLoading}
+      />
+
+      <DetailedPromptModal
+        isOpen={isDetailedViewOpen}
+        onClose={handleCloseDetailedView}
+        prompt={selectedPrompt}
       />
     </div>
   );

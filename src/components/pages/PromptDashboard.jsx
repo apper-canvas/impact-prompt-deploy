@@ -18,12 +18,21 @@ const PromptDashboard = () => {
   const [selectedPrompt, setSelectedPrompt] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
 
-  const loadPrompts = async () => {
+const loadPrompts = async () => {
     try {
       setLoading(true);
       setError("");
       const data = await promptService.getAll();
-      setPrompts(data);
+      // Ensure performance metrics have default values
+      const promptsWithMetrics = data.map(prompt => ({
+        ...prompt,
+        totalUsage: prompt.totalUsage || 0,
+        successRate: prompt.successRate || 0,
+        avgResponseTime: prompt.avgResponseTime || 0,
+        costPerRequest: prompt.costPerRequest || 0,
+        totalCost: prompt.totalCost || 0
+      }));
+      setPrompts(promptsWithMetrics);
     } catch (err) {
       setError("Failed to load prompts. Please try again.");
       console.error("Error loading prompts:", err);

@@ -16,7 +16,12 @@
     "deploymentDate": "2024-01-21T09:15:00Z",
     "environment": "Production",
     "deploymentUrl": "https://api.example.com/prompts/customer-support",
-    "lastUpdated": "2024-01-21T09:15:00Z"
+    "lastUpdated": "2024-01-21T09:15:00Z",
+    "totalUsage": 15420,
+    "successRate": 97.3,
+    "avgResponseTime": 320,
+    "costPerRequest": 0.0035,
+    "totalCost": 53.97
   },
   {
 "Id": 2,
@@ -35,7 +40,12 @@
     "deploymentDate": "2024-01-19T10:30:00Z",
     "environment": "Staging",
     "deploymentUrl": "https://staging-api.example.com/prompts/code-review",
-    "lastUpdated": "2024-01-19T10:30:00Z"
+    "lastUpdated": "2024-01-19T10:30:00Z",
+    "totalUsage": 8765,
+    "successRate": 94.2,
+    "avgResponseTime": 580,
+    "costPerRequest": 0.0052,
+    "totalCost": 45.58
   },
   {
 "Id": 3,
@@ -54,7 +64,12 @@
     "deploymentDate": null,
     "environment": "Development",
     "deploymentUrl": "",
-    "lastUpdated": "2024-01-20T11:20:00Z"
+    "lastUpdated": "2024-01-20T11:20:00Z",
+    "totalUsage": 0,
+    "successRate": 0,
+    "avgResponseTime": 0,
+    "costPerRequest": 0.0018,
+    "totalCost": 0
   },
   {
 "Id": 4,
@@ -73,7 +88,12 @@
     "deploymentDate": "2024-01-16T14:20:00Z",
     "environment": "Production",
     "deploymentUrl": "https://api.example.com/prompts/sql-assistant",
-    "lastUpdated": "2024-01-16T14:20:00Z"
+    "lastUpdated": "2024-01-16T14:20:00Z",
+    "totalUsage": 2341,
+    "successRate": 88.7,
+    "avgResponseTime": 1200,
+    "costPerRequest": 0.0015,
+    "totalCost": 3.51
   },
   {
 "Id": 5,
@@ -92,7 +112,12 @@
     "deploymentDate": "2024-01-23T08:45:00Z",
     "environment": "Production",
     "deploymentUrl": "https://api.example.com/prompts/email-writer",
-    "lastUpdated": "2024-01-23T08:45:00Z"
+    "lastUpdated": "2024-01-23T08:45:00Z",
+    "totalUsage": 12890,
+    "successRate": 96.1,
+    "avgResponseTime": 280,
+    "costPerRequest": 0.0028,
+    "totalCost": 36.09
   },
   {
 "Id": 6,
@@ -111,7 +136,12 @@
     "deploymentDate": null,
     "environment": "Development",
     "deploymentUrl": "",
-    "lastUpdated": "2024-01-22T15:30:00Z"
+    "lastUpdated": "2024-01-22T15:30:00Z",
+    "totalUsage": 156,
+    "successRate": 91.0,
+    "avgResponseTime": 750,
+    "costPerRequest": 0.0042,
+    "totalCost": 0.66
   },
   {
 "Id": 7,
@@ -130,7 +160,12 @@
     "deploymentDate": "2024-01-20T11:00:00Z",
     "environment": "Staging",
     "deploymentUrl": "https://staging-api.example.com/prompts/meeting-summarizer",
-    "lastUpdated": "2024-01-20T11:00:00Z"
+    "lastUpdated": "2024-01-20T11:00:00Z",
+    "totalUsage": 4520,
+    "successRate": 93.8,
+    "avgResponseTime": 420,
+    "costPerRequest": 0.0021,
+    "totalCost": 9.49
   },
   {
 "Id": 8,
@@ -149,6 +184,11 @@
     "deploymentDate": null,
     "environment": "Development",
     "deploymentUrl": "",
-    "lastUpdated": "2024-01-12T11:30:00Z"
+    "lastUpdated": "2024-01-12T11:30:00Z",
+    "totalUsage": 672,
+    "successRate": 85.4,
+    "avgResponseTime": 980,
+    "costPerRequest": 0.0038,
+    "totalCost": 2.55
   }
 ]

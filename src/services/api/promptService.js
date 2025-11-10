@@ -49,7 +49,7 @@ export const promptService = {
     const newId = maxId + 1;
     
 const now = new Date().toISOString();
-    const newPrompt = {
+const newPrompt = {
       Id: newId,
       name: prompt.name,
       description: prompt.description,
@@ -61,6 +61,14 @@ const now = new Date().toISOString();
       status: prompt.status,
       tags: prompt.tags || [],
       category: prompt.category || "",
+      environment: prompt.environment || "Development",
+      deploymentUrl: prompt.deploymentUrl || "",
+      deploymentDate: prompt.deploymentDate || null,
+      totalUsage: prompt.totalUsage || 0,
+      successRate: prompt.successRate || 0,
+      avgResponseTime: prompt.avgResponseTime || 0,
+      costPerRequest: prompt.costPerRequest || 0,
+      totalCost: prompt.totalCost || 0,
       createdDate: now,
       updatedDate: now
     };
@@ -92,6 +100,14 @@ const updatedPrompt = {
       status: promptData.status,
       tags: promptData.tags || [],
       category: promptData.category || "",
+      environment: promptData.environment || "Development",
+      deploymentUrl: promptData.deploymentUrl || "",
+      deploymentDate: promptData.deploymentDate || null,
+      totalUsage: promptData.totalUsage || 0,
+      successRate: promptData.successRate || 0,
+      avgResponseTime: promptData.avgResponseTime || 0,
+      costPerRequest: promptData.costPerRequest || 0,
+      totalCost: promptData.totalCost || 0,
       Id: parseInt(id), // Ensure Id remains unchanged
       createdDate: data[index].createdDate, // Preserve original creation date
       updatedDate: new Date().toISOString()

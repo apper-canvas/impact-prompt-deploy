@@ -91,7 +91,12 @@ const [formData, setFormData] = useState({
     category: "",
     environment: "Development",
     deploymentUrl: "",
-    deploymentDate: null
+    deploymentDate: null,
+    totalUsage: 0,
+    successRate: 0,
+    avgResponseTime: 0,
+    costPerRequest: 0,
+    totalCost: 0
   });
 
   const [currentTag, setCurrentTag] = useState("");
@@ -123,7 +128,12 @@ setFormData({
         category: prompt.category || "",
         environment: prompt.environment || "Development",
         deploymentUrl: prompt.deploymentUrl || "",
-        deploymentDate: prompt.deploymentDate || null
+        deploymentDate: prompt.deploymentDate || null,
+        totalUsage: prompt.totalUsage || 0,
+        successRate: prompt.successRate || 0,
+        avgResponseTime: prompt.avgResponseTime || 0,
+        costPerRequest: prompt.costPerRequest || 0,
+        totalCost: prompt.totalCost || 0
       });
     } else {
 setFormData({
@@ -139,7 +149,12 @@ setFormData({
         category: "",
         environment: "Development",
         deploymentUrl: "",
-        deploymentDate: null
+        deploymentDate: null,
+        totalUsage: 0,
+        successRate: 0,
+        avgResponseTime: 0,
+        costPerRequest: 0,
+        totalCost: 0
       });
     }
     setCurrentTag("");
@@ -402,7 +417,7 @@ const handleTagKeyPress = (e) => {
             )}
 
             <FormField
-label="Status"
+              label="Status"
             >
               <Select
                 value={formData.status}
@@ -414,63 +429,65 @@ label="Status"
                 ))}
               </Select>
             </FormField>
-{/* Tags Field */}
-              <FormField label="Tags" error={errors.tags}>
-                <div className="space-y-3">
-                  <div className="flex gap-2">
-                    <Input
-                      value={currentTag}
-                      onChange={(e) => setCurrentTag(e.target.value)}
-                      onKeyDown={handleTagKeyPress}
-                      placeholder="Add tags (press Enter or comma to add)"
-                      className="flex-1"
-                    />
-                    <Button
-                      type="button"
-                      onClick={handleAddTag}
-                      disabled={!currentTag.trim()}
-                      className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Add
-                    </Button>
-                  </div>
-                  {formData.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {formData.tags.map((tag, index) => (
-                        <Badge
-                          key={index}
-                          className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
-                        >
-                          {tag}
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveTag(tag)}
-                            className="text-blue-600 hover:text-blue-800 ml-1"
-                          >
-                            <ApperIcon name="X" size={14} />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </FormField>
 
-              {/* Category Field */}
-              <FormField label="Category" error={errors.category}>
-                <Select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent"
-                >
-                  <option value="">Select a category</option>
-                  {categoryOptions.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </Select>
-              </FormField>
+            {/* Tags Field */}
+            <FormField label="Tags" error={errors.tags}>
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <Input
+                    value={currentTag}
+                    onChange={(e) => setCurrentTag(e.target.value)}
+                    onKeyDown={handleTagKeyPress}
+                    placeholder="Add tags (press Enter or comma to add)"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    onClick={handleAddTag}
+                    disabled={!currentTag.trim()}
+                    className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Add
+                  </Button>
+                </div>
+                {formData.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {formData.tags.map((tag, index) => (
+                      <Badge
+                        key={index}
+                        className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTag(tag)}
+                          className="text-blue-600 hover:text-blue-800 ml-1"
+                        >
+                          <ApperIcon name="X" size={14} />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </FormField>
+
+            {/* Category Field */}
+            <FormField label="Category" error={errors.category}>
+              <Select
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent"
+              >
+                <option value="">Select a category</option>
+                {categoryOptions.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </Select>
+            </FormField>
+
             {/* Deployment Information */}
             <div className="col-span-2 border-t border-slate-200 pt-6 mt-6">
               <h3 className="text-lg font-semibold text-slate-900 mb-4">Deployment Information</h3>
@@ -503,7 +520,94 @@ label="Status"
                   />
                 </FormField>
               </div>
-</div>
+            </div>
+
+            {/* Performance Metrics Section */}
+            <div className="col-span-2 border-t border-slate-200 pt-6 mt-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                <ApperIcon name="BarChart3" size={20} />
+                Performance Metrics
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  label="Total Usage Count"
+                  error={errors.totalUsage}
+                >
+                  <Input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={formData.totalUsage}
+                    onChange={(e) => handleInputChange("totalUsage", parseInt(e.target.value) || 0)}
+                    placeholder="0"
+                    disabled={loading}
+                  />
+                </FormField>
+
+                <FormField
+                  label="Success Rate (%)"
+                  error={errors.successRate}
+                >
+                  <Input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={formData.successRate}
+                    onChange={(e) => handleInputChange("successRate", parseFloat(e.target.value) || 0)}
+                    placeholder="95.5"
+                    disabled={loading}
+                  />
+                </FormField>
+
+                <FormField
+                  label="Average Response Time (ms)"
+                  error={errors.avgResponseTime}
+                >
+                  <Input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={formData.avgResponseTime}
+                    onChange={(e) => handleInputChange("avgResponseTime", parseInt(e.target.value) || 0)}
+                    placeholder="250"
+                    disabled={loading}
+                  />
+                </FormField>
+
+                <FormField
+                  label="Cost per Request ($)"
+                  error={errors.costPerRequest}
+                >
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.0001"
+                    value={formData.costPerRequest}
+                    onChange={(e) => handleInputChange("costPerRequest", parseFloat(e.target.value) || 0)}
+                    placeholder="0.0025"
+                    disabled={loading}
+                  />
+                </FormField>
+              </div>
+
+              <div className="mt-4">
+                <FormField
+                  label="Total Cost ($)"
+                  error={errors.totalCost}
+                >
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formData.totalCost}
+                    onChange={(e) => handleInputChange("totalCost", parseFloat(e.target.value) || 0)}
+                    placeholder="12.45"
+                    disabled={loading}
+                  />
+                </FormField>
+              </div>
+            </div>
           </form>
 
           {/* Footer */}

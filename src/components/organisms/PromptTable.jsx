@@ -2,6 +2,8 @@ import React, { useMemo, useState } from "react";
 import { format } from "date-fns";
 import ApperIcon from "@/components/ApperIcon";
 import Badge from "@/components/atoms/Badge";
+import Button from "@/components/atoms/Button";
+import Select from "@/components/atoms/Select";
 import ActionMenu from "@/components/molecules/ActionMenu";
 import StatusBadge from "@/components/molecules/StatusBadge";
 import SearchBar from "@/components/molecules/SearchBar";
@@ -69,18 +71,37 @@ const AI_MODELS = [
 const PromptTable = ({ prompts, onEdit, onDelete }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: "createdDate", direction: "desc" });
-const filteredPrompts = useMemo(() => {
-return prompts.filter(prompt =>
-      prompt.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      prompt.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      prompt.provider?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      prompt.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      prompt.environment?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      prompt.deploymentUrl?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      prompt.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      prompt.category?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [prompts, searchTerm]);
+  const [modelFilter, setModelFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [providerFilter, setProviderFilter] = useState("");
+// Extract unique filter options from prompts
+  const filterOptions = useMemo(() => {
+    const models = [...new Set(prompts.map(p => p.model).filter(Boolean))].sort();
+    const statuses = [...new Set(prompts.map(p => p.status).filter(Boolean))].sort();
+    const categories = [...new Set(prompts.map(p => p.category).filter(Boolean))].sort();
+    const providers = [...new Set(prompts.map(p => p.provider).filter(Boolean))].sort();
+    
+    return { models, statuses, categories, providers };
+  }, [prompts]);
+
+  const filteredPrompts = useMemo(() => {
+    return prompts.filter(prompt => {
+      // Text search filter
+      const matchesSearch = !searchTerm || (
+        prompt.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        prompt.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      // Dropdown filters
+      const matchesModel = !modelFilter || prompt.model === modelFilter;
+      const matchesStatus = !statusFilter || prompt.status === statusFilter;
+      const matchesCategory = !categoryFilter || prompt.category === categoryFilter;
+      const matchesProvider = !providerFilter || prompt.provider === providerFilter;
+
+      return matchesSearch && matchesModel && matchesStatus && matchesCategory && matchesProvider;
+    });
+  }, [prompts, searchTerm, modelFilter, statusFilter, categoryFilter, providerFilter]);
 
   const sortedPrompts = useMemo(() => {
     const sorted = [...filteredPrompts];
@@ -126,17 +147,104 @@ const handleSort = (key) => {
   );
 
   return (
-    <div className="space-y-4">
-      {/* Search and Filters */}
+<div className="space-y-4">
+      {/* Filter Controls */}
+      <div className="bg-slate-50 p-4 rounded-lg border space-y-4">
+        {/* Filter Dropdowns */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Model</label>
+            <Select
+              value={modelFilter}
+              onChange={(e) => setModelFilter(e.target.value)}
+              className="w-full"
+            >
+              <option value="">All Models</option>
+              {filterOptions.models.map(model => (
+                <option key={model} value={model}>{model}</option>
+              ))}
+            </Select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
+            <Select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full"
+            >
+              <option value="">All Statuses</option>
+              {filterOptions.statuses.map(status => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </Select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+            <Select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="w-full"
+            >
+              <option value="">All Categories</option>
+              {filterOptions.categories.map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </Select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Provider</label>
+            <Select
+              value={providerFilter}
+              onChange={(e) => setProviderFilter(e.target.value)}
+              className="w-full"
+            >
+              <option value="">All Providers</option>
+              {filterOptions.providers.map(provider => (
+                <option key={provider} value={provider}>{provider}</option>
+              ))}
+            </Select>
+          </div>
+        </div>
+
+        {/* Clear Filters Button */}
+        {(modelFilter || statusFilter || categoryFilter || providerFilter) && (
+          <div className="flex justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setModelFilter("");
+                setStatusFilter("");
+                setCategoryFilter("");
+                setProviderFilter("");
+              }}
+              className="text-sm"
+            >
+              <ApperIcon name="X" size={14} className="mr-1" />
+              Clear Filters
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Search and Results */}
       <div className="flex items-center justify-between">
         <SearchBar
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search by name, model, or description..."
+          placeholder="Search by name or description..."
           className="w-96"
         />
         <div className="text-sm text-slate-600">
           {sortedPrompts.length} prompt{sortedPrompts.length !== 1 ? "s" : ""}
+          {(searchTerm || modelFilter || statusFilter || categoryFilter || providerFilter) && (
+            <span className="ml-2 text-blue-600">
+              (filtered from {prompts.length})
+            </span>
+          )}
         </div>
       </div>
 
@@ -203,7 +311,7 @@ const handleSort = (key) => {
                       </div>
                     </div>
                   </td>
-<td className="px-6 py-4">
+                  <td className="px-6 py-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="text-xs">
@@ -221,7 +329,7 @@ const handleSort = (key) => {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-<StatusBadge status={prompt.status} />
+                    <StatusBadge status={prompt.status} />
                   </td>
 
                   <td className="px-6 py-4 text-sm text-secondary">
@@ -251,7 +359,7 @@ const handleSort = (key) => {
                       </div>
                     )}
                   </td>
-<td className="px-6 py-4 text-sm text-slate-600">
+                  <td className="px-6 py-4 text-sm text-slate-600">
                     <div className="flex items-center space-x-2">
                       <Badge 
                         variant={
@@ -283,7 +391,7 @@ const handleSort = (key) => {
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600">
                     {format(new Date(prompt.createdDate), "MMM d, yyyy")}
-</td>
+                  </td>
                   <td className="px-6 py-4">
                     <ActionMenu
                       onEdit={() => onEdit(prompt)}

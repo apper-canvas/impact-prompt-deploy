@@ -7,14 +7,62 @@ import Select from "@/components/atoms/Select";
 import FormField from "@/components/molecules/FormField";
 
 const AI_MODELS = [
-  "GPT-4",
-  "GPT-3.5",
-  "Claude-3",
-  "Claude-2",
-  "Gemini-Pro",
-  "LLaMA-2",
-  "PaLM-2",
-  "Cohere-Command"
+  {
+    id: "gpt-4",
+    name: "GPT-4",
+    provider: "OpenAI",
+    version: "gpt-4-0125-preview",
+    defaultTemperature: 0.7,
+    defaultMaxTokens: 4096
+  },
+  {
+    id: "gpt-35-turbo",
+    name: "GPT-3.5 Turbo",
+    provider: "OpenAI", 
+    version: "gpt-3.5-turbo-0125",
+    defaultTemperature: 0.7,
+    defaultMaxTokens: 4096
+  },
+  {
+    id: "claude-3-opus",
+    name: "Claude-3 Opus",
+    provider: "Anthropic",
+    version: "claude-3-opus-20240229",
+    defaultTemperature: 0.7,
+    defaultMaxTokens: 4096
+  },
+  {
+    id: "claude-3-sonnet",
+    name: "Claude-3 Sonnet", 
+    provider: "Anthropic",
+    version: "claude-3-sonnet-20240229",
+    defaultTemperature: 0.7,
+    defaultMaxTokens: 4096
+  },
+  {
+    id: "gemini-pro",
+    name: "Gemini Pro",
+    provider: "Google",
+    version: "gemini-1.0-pro-latest",
+    defaultTemperature: 0.9,
+    defaultMaxTokens: 2048
+  },
+  {
+    id: "llama-2-70b",
+    name: "LLaMA-2 70B",
+    provider: "Meta",
+    version: "llama-2-70b-chat",
+    defaultTemperature: 0.8,
+    defaultMaxTokens: 2048
+  },
+  {
+    id: "command",
+    name: "Cohere Command",
+    provider: "Cohere", 
+    version: "command-r-plus",
+    defaultTemperature: 0.3,
+    defaultMaxTokens: 4000
+  }
 ];
 
 const STATUSES = [
@@ -30,20 +78,28 @@ const PromptModal = ({
   prompt = null, 
   loading = false 
 }) => {
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     name: "",
     description: "",
     model: "",
+    modelVersion: "",
+    temperature: 0.7,
+    maxTokens: 4096,
+    provider: "",
     status: "Draft"
   });
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (prompt) {
-      setFormData({
+setFormData({
         name: prompt.name || "",
         description: prompt.description || "",
         model: prompt.model || "",
+        modelVersion: prompt.modelVersion || "",
+        temperature: prompt.temperature || 0.7,
+        maxTokens: prompt.maxTokens || 4096,
+        provider: prompt.provider || "",
         status: prompt.status || "Draft"
       });
     } else {
@@ -51,13 +107,17 @@ const PromptModal = ({
         name: "",
         description: "",
         model: "",
+        modelVersion: "",
+        temperature: 0.7,
+        maxTokens: 4096,
+        provider: "",
         status: "Draft"
       });
     }
     setErrors({});
   }, [prompt, isOpen]);
 
-  const validateForm = () => {
+const validateForm = () => {
     const newErrors = {};
     
     if (!formData.name.trim()) {
@@ -70,6 +130,22 @@ const PromptModal = ({
     
     if (!formData.model) {
       newErrors.model = "Model selection is required";
+    }
+
+    if (!formData.modelVersion.trim()) {
+      newErrors.modelVersion = "Model version is required";
+    }
+
+    if (formData.temperature < 0 || formData.temperature > 2) {
+      newErrors.temperature = "Temperature must be between 0.0 and 2.0";
+    }
+
+    if (formData.maxTokens < 100 || formData.maxTokens > 8000) {
+      newErrors.maxTokens = "Max tokens must be between 100 and 8000";
+    }
+
+    if (!formData.provider.trim()) {
+      newErrors.provider = "Provider is required";
     }
 
     setErrors(newErrors);
@@ -131,7 +207,7 @@ const PromptModal = ({
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
+<form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
             <FormField
               label="Name"
               error={errors.name}
@@ -170,16 +246,95 @@ const PromptModal = ({
             >
               <Select
                 value={formData.model}
-                onChange={(e) => handleInputChange("model", e.target.value)}
+                onChange={(e) => {
+                  const selectedModel = AI_MODELS.find(model => model.id === e.target.value);
+                  handleInputChange("model", e.target.value);
+                  if (selectedModel) {
+                    handleInputChange("modelVersion", selectedModel.version);
+                    handleInputChange("temperature", selectedModel.defaultTemperature);
+                    handleInputChange("maxTokens", selectedModel.defaultMaxTokens);
+                    handleInputChange("provider", selectedModel.provider);
+                  }
+                }}
                 error={!!errors.model}
                 disabled={loading}
               >
                 <option value="">Select a model...</option>
                 {AI_MODELS.map(model => (
-                  <option key={model} value={model}>{model}</option>
+                  <option key={model.id} value={model.id}>{model.name}</option>
                 ))}
               </Select>
             </FormField>
+
+            {formData.model && (
+              <>
+                <FormField
+                  label="Provider"
+                  error={errors.provider}
+                  required
+                >
+                  <Input
+                    value={formData.provider}
+                    onChange={(e) => handleInputChange("provider", e.target.value)}
+                    placeholder="e.g., OpenAI, Anthropic"
+                    error={!!errors.provider}
+                    disabled={loading}
+                  />
+                </FormField>
+
+                <FormField
+                  label="Model Version"
+                  error={errors.modelVersion}
+                  required
+                >
+                  <Input
+                    value={formData.modelVersion}
+                    onChange={(e) => handleInputChange("modelVersion", e.target.value)}
+                    placeholder="e.g., gpt-4-0125-preview"
+                    error={!!errors.modelVersion}
+                    disabled={loading}
+                  />
+                </FormField>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    label="Temperature"
+                    error={errors.temperature}
+                    required
+                  >
+                    <Input
+                      type="number"
+                      min="0"
+                      max="2"
+                      step="0.1"
+                      value={formData.temperature}
+                      onChange={(e) => handleInputChange("temperature", parseFloat(e.target.value) || 0)}
+                      placeholder="0.7"
+                      error={!!errors.temperature}
+                      disabled={loading}
+                    />
+                  </FormField>
+
+                  <FormField
+                    label="Max Tokens"
+                    error={errors.maxTokens}
+                    required
+                  >
+                    <Input
+                      type="number"
+                      min="100"
+                      max="8000"
+                      step="100"
+                      value={formData.maxTokens}
+                      onChange={(e) => handleInputChange("maxTokens", parseInt(e.target.value) || 0)}
+                      placeholder="4096"
+                      error={!!errors.maxTokens}
+                      disabled={loading}
+                    />
+                  </FormField>
+                </div>
+              </>
+            )}
 
             <FormField
               label="Status"

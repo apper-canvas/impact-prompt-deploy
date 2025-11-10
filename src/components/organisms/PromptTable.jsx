@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { format } from "date-fns";
 import ApperIcon from "@/components/ApperIcon";
-import StatusBadge from "@/components/molecules/StatusBadge";
+import Badge from "@/components/atoms/Badge";
 import ActionMenu from "@/components/molecules/ActionMenu";
+import StatusBadge from "@/components/molecules/StatusBadge";
 import SearchBar from "@/components/molecules/SearchBar";
 
 const PromptTable = ({ prompts, onEdit, onDelete }) => {
@@ -10,9 +11,10 @@ const PromptTable = ({ prompts, onEdit, onDelete }) => {
   const [sortConfig, setSortConfig] = useState({ key: "createdDate", direction: "desc" });
 
   const filteredPrompts = useMemo(() => {
-    return prompts.filter(prompt =>
+return prompts.filter(prompt =>
       prompt.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       prompt.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prompt.provider?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       prompt.description.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [prompts, searchTerm]);
@@ -112,8 +114,22 @@ const PromptTable = ({ prompts, onEdit, onDelete }) => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-600">
-                    {prompt.model}
+<td className="px-6 py-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">
+                          {AI_MODELS.find(m => m.id === prompt.model)?.name || prompt.model}
+                        </Badge>
+                        <Badge variant="secondary" className="text-xs">
+                          {prompt.provider}
+                        </Badge>
+                      </div>
+                      {prompt.temperature !== undefined && prompt.maxTokens !== undefined && (
+                        <div className="text-xs text-slate-500">
+                          T: {prompt.temperature} • Max: {prompt.maxTokens}
+                        </div>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <StatusBadge status={prompt.status} />

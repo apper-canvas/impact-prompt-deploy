@@ -48,10 +48,17 @@ export const promptService = {
     const maxId = data.reduce((max, item) => Math.max(max, item.Id), 0);
     const newId = maxId + 1;
     
-    const now = new Date().toISOString();
+const now = new Date().toISOString();
     const newPrompt = {
       Id: newId,
-      ...prompt,
+      name: prompt.name,
+      description: prompt.description,
+      model: prompt.model,
+      modelVersion: prompt.modelVersion,
+      temperature: prompt.temperature,
+      maxTokens: prompt.maxTokens,
+      provider: prompt.provider,
+      status: prompt.status,
       createdDate: now,
       updatedDate: now
     };
@@ -71,10 +78,18 @@ export const promptService = {
       throw new Error("Prompt not found");
     }
     
-    const updatedPrompt = {
+const updatedPrompt = {
       ...data[index],
-      ...promptData,
+      name: promptData.name,
+      description: promptData.description,
+      model: promptData.model,
+      modelVersion: promptData.modelVersion,
+      temperature: promptData.temperature,
+      maxTokens: promptData.maxTokens,
+      provider: promptData.provider,
+      status: promptData.status,
       Id: parseInt(id), // Ensure Id remains unchanged
+      createdDate: data[index].createdDate, // Preserve original creation date
       updatedDate: new Date().toISOString()
     };
     

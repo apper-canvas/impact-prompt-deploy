@@ -6,6 +6,66 @@ import ActionMenu from "@/components/molecules/ActionMenu";
 import StatusBadge from "@/components/molecules/StatusBadge";
 import SearchBar from "@/components/molecules/SearchBar";
 
+// AI Models configuration for display purposes
+const AI_MODELS = [
+  {
+    id: "gpt-4",
+    name: "GPT-4",
+    provider: "OpenAI",
+    version: "gpt-4-0125-preview",
+    defaultTemperature: 0.7,
+    defaultMaxTokens: 4096,
+  },
+  {
+    id: "gpt-35-turbo",
+    name: "GPT-3.5 Turbo",
+    provider: "OpenAI",
+    version: "gpt-3.5-turbo-0125",
+    defaultTemperature: 0.7,
+    defaultMaxTokens: 4096,
+  },
+  {
+    id: "claude-3-opus",
+    name: "Claude-3 Opus",
+    provider: "Anthropic",
+    version: "claude-3-opus-20240229",
+    defaultTemperature: 0.7,
+    defaultMaxTokens: 4096,
+  },
+  {
+    id: "claude-3-sonnet",
+    name: "Claude-3 Sonnet",
+    provider: "Anthropic",
+    version: "claude-3-sonnet-20240229",
+    defaultTemperature: 0.7,
+    defaultMaxTokens: 4096,
+  },
+  {
+    id: "claude-3-haiku",
+    name: "Claude-3 Haiku",
+    provider: "Anthropic",
+    version: "claude-3-haiku-20240307",
+    defaultTemperature: 0.7,
+    defaultMaxTokens: 4096,
+  },
+  {
+    id: "gemini-pro",
+    name: "Gemini Pro",
+    provider: "Google",
+    version: "gemini-1.0-pro",
+    defaultTemperature: 0.7,
+    defaultMaxTokens: 2048,
+  },
+  {
+    id: "gemini-flash",
+    name: "Gemini Flash",
+    provider: "Google", 
+    version: "gemini-1.5-flash",
+    defaultTemperature: 0.7,
+    defaultMaxTokens: 8192,
+  },
+];
+
 const PromptTable = ({ prompts, onEdit, onDelete }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: "createdDate", direction: "desc" });

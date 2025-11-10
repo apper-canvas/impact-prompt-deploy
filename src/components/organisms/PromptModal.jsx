@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import ApperIcon from "@/components/ApperIcon";
 import Button from "@/components/atoms/Button";
 import Input from "@/components/atoms/Input";
@@ -86,12 +86,15 @@ const [formData, setFormData] = useState({
     temperature: 0.7,
     maxTokens: 4096,
     provider: "",
-    status: "Draft"
+    status: "Draft",
+    environment: "Development",
+    deploymentUrl: "",
+    deploymentDate: null
   });
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    if (prompt) {
+if (prompt) {
 setFormData({
         name: prompt.name || "",
         description: prompt.description || "",
@@ -100,10 +103,13 @@ setFormData({
         temperature: prompt.temperature || 0.7,
         maxTokens: prompt.maxTokens || 4096,
         provider: prompt.provider || "",
-        status: prompt.status || "Draft"
+        status: prompt.status || "Draft",
+        environment: prompt.environment || "Development",
+        deploymentUrl: prompt.deploymentUrl || "",
+        deploymentDate: prompt.deploymentDate || null
       });
     } else {
-      setFormData({
+setFormData({
         name: "",
         description: "",
         model: "",
@@ -111,11 +117,23 @@ setFormData({
         temperature: 0.7,
         maxTokens: 4096,
         provider: "",
-        status: "Draft"
+        status: "Draft",
+        environment: "Development",
+        deploymentUrl: "",
+        deploymentDate: null
       });
     }
     setErrors({});
-  }, [prompt, isOpen]);
+}, [prompt, isOpen]);
+
+  const isValidUrl = (string) => {
+    try {
+      new URL(string);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  };
 
 const validateForm = () => {
     const newErrors = {};
@@ -146,6 +164,10 @@ const validateForm = () => {
 
     if (!formData.provider.trim()) {
       newErrors.provider = "Provider is required";
+    }
+
+    if (formData.deploymentUrl && !isValidUrl(formData.deploymentUrl)) {
+      newErrors.deploymentUrl = "Please enter a valid URL";
     }
 
     setErrors(newErrors);
@@ -337,7 +359,7 @@ const validateForm = () => {
             )}
 
             <FormField
-              label="Status"
+label="Status"
             >
               <Select
                 value={formData.status}
@@ -349,6 +371,40 @@ const validateForm = () => {
                 ))}
               </Select>
             </FormField>
+
+            {/* Deployment Information */}
+            <div className="col-span-2 border-t border-slate-200 pt-6 mt-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Deployment Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  label="Environment"
+                  error={errors.environment}
+                >
+                  <Select
+                    value={formData.environment}
+                    onChange={(e) => handleInputChange("environment", e.target.value)}
+                    disabled={loading}
+                  >
+                    <option value="Development">Development</option>
+                    <option value="Staging">Staging</option>
+                    <option value="Production">Production</option>
+                  </Select>
+                </FormField>
+
+                <FormField
+                  label="Deployment URL"
+                  error={errors.deploymentUrl}
+                >
+                  <Input
+                    type="url"
+                    placeholder="https://api.example.com/prompts/..."
+                    value={formData.deploymentUrl}
+                    onChange={(e) => handleInputChange("deploymentUrl", e.target.value)}
+                    disabled={loading}
+                  />
+                </FormField>
+              </div>
+            </div>
           </form>
 
           {/* Footer */}

@@ -69,13 +69,14 @@ const AI_MODELS = [
 const PromptTable = ({ prompts, onEdit, onDelete }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: "createdDate", direction: "desc" });
-
-  const filteredPrompts = useMemo(() => {
+const filteredPrompts = useMemo(() => {
 return prompts.filter(prompt =>
       prompt.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       prompt.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
       prompt.provider?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      prompt.description.toLowerCase().includes(searchTerm.toLowerCase())
+      prompt.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prompt.environment?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prompt.deploymentUrl?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [prompts, searchTerm]);
 
@@ -83,11 +84,11 @@ return prompts.filter(prompt =>
     const sorted = [...filteredPrompts];
     if (sortConfig.key) {
       sorted.sort((a, b) => {
-        const aValue = sortConfig.key === "createdDate" || sortConfig.key === "updatedDate" 
-          ? new Date(a[sortConfig.key]).getTime()
+const aValue = sortConfig.key === "createdDate" || sortConfig.key === "updatedDate" || sortConfig.key === "deploymentDate"
+          ? new Date(a[sortConfig.key] || 0).getTime()
           : a[sortConfig.key];
-        const bValue = sortConfig.key === "createdDate" || sortConfig.key === "updatedDate"
-          ? new Date(b[sortConfig.key]).getTime()
+        const bValue = sortConfig.key === "createdDate" || sortConfig.key === "updatedDate" || sortConfig.key === "deploymentDate"
+          ? new Date(b[sortConfig.key] || 0).getTime()
           : b[sortConfig.key];
 
         if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
@@ -151,6 +152,28 @@ return prompts.filter(prompt =>
                 </th>
                 <th className="px-6 py-4 text-left">
                   <SortButton sortKey="status">Status</SortButton>
+</th>
+                <th 
+                  className="px-6 py-4 text-left text-sm font-semibold text-slate-700 cursor-pointer hover:text-slate-900 transition-colors"
+                  onClick={() => handleSort("environment")}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Environment</span>
+                    {sortConfig.key === "environment" && (
+                      <ApperIcon name={sortConfig.direction === "asc" ? "ChevronUp" : "ChevronDown"} size={16} />
+                    )}
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-4 text-left text-sm font-semibold text-slate-700 cursor-pointer hover:text-slate-900 transition-colors"
+                  onClick={() => handleSort("deploymentDate")}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Last Deployed</span>
+                    {sortConfig.key === "deploymentDate" && (
+                      <ApperIcon name={sortConfig.direction === "asc" ? "ChevronUp" : "ChevronDown"} size={16} />
+                    )}
+                  </div>
                 </th>
                 <th className="px-6 py-4 text-left">
                   <SortButton sortKey="createdDate">Created</SortButton>
@@ -193,6 +216,36 @@ return prompts.filter(prompt =>
                   </td>
                   <td className="px-6 py-4">
                     <StatusBadge status={prompt.status} />
+                  </td>
+<td className="px-6 py-4 text-sm text-slate-600">
+                    <div className="flex items-center space-x-2">
+                      <Badge 
+                        variant={
+                          prompt.environment === "Production" ? "success" :
+                          prompt.environment === "Staging" ? "warning" : "secondary"
+                        }
+                        size="sm"
+                      >
+                        {prompt.environment}
+                      </Badge>
+                      {prompt.deploymentUrl && (
+                        <a 
+                          href={prompt.deploymentUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 transition-colors"
+                          title="View deployment"
+                        >
+                          <ApperIcon name="ExternalLink" size={14} />
+                        </a>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-slate-600">
+                    {prompt.deploymentDate 
+                      ? format(new Date(prompt.deploymentDate), "MMM d, yyyy") 
+                      : "Not deployed"
+                    }
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600">
                     {format(new Date(prompt.createdDate), "MMM d, yyyy")}

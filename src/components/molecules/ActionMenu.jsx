@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { ApperIcon } from '@/components/ApperIcon';
-import { Button } from '@/components/atoms/Button';
+import Button from '@/components/atoms/Button';
 
 const ActionMenu = ({ onEdit, onDelete, onViewVersions }) => {
   const [isOpen, setIsOpen] = useState(false);
